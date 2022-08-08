@@ -1,0 +1,40 @@
+@media screen {
+      body {background-color: #ffffff;}
+      h1, h2, h3, h4, h5, h6 {
+             color: blue;
+             font-family: verdana, Helvetica, Univers, sans-serif}
+      th    {font-family: Verdana, Helvetica, Univers, sans-serif;
+             font-size: small;}
+      td    {font-family: Verdana, Helvetica, Univers, sans-serif;
+             font-size: small;}
+      .demi {font-family: Verdana, Helvetica, Univers, sans-serif;
+             font-size: small; font-weight: demi-bold; color: darkgreen;
+             padding-bottom: .4em; }
+      .green { color: green;}
+      p     {font-family: Verdana, Helvetica, Univers, sans-serif;
+             font-size: x-small;}
+      b     {font-family: Verdana, Helvetica, Univers, sans-serif;
+             font-size: small;}
+      small {font-family: Verdana, Helvetica, Univers, sans-serif;
+             font-size: x-small; font-color: green;}
+}
+@media print{
+      body {background-color: #ffffff;}
+      h1, h2, h3, h4, h5, h6 {
+             color: blue;
+             font-family: verdana, Helvetica, Univers, sans-serif}
+      th    {font-family: Verdana, Helvetica, Univers, sans-serif;
+             font-size: 10px;}
+      td    {font-family: Verdana, Helvetica, Univers, sans-serif;
+             font-size: 10px;}
+      .demi {font-family: Verdana, Helvetica, Univers, sans-serif;
+             font-size: 10px; font-weight: demi-bold; color: darkgreen;
+             padding-bottom: .4em; }
+      .green { color: green;}
+      p     {font-family: Verdana, Helvetica, Univers, sans-serif;
+             font-size: 10px;}
+      b     {font-family: Verdana, Helvetica, Univers, sans-serif;
+             font-size: 10px;}
+      small {font-family: Verdana, Helvetica, Univers, sans-serif;
+             font-size: 10px; font-color: green;}
+}

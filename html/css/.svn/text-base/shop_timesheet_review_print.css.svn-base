@@ -1,0 +1,13 @@
+td {
+  border: 1px solid #000;
+}
+th {
+  border: 1px solid #000;
+}
+a {
+  color: #000;
+  text-decoration: none;
+}
+.no_print {
+  display: none;
+}

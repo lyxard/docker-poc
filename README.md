@@ -1,2 +1,1 @@
-# docker-poc
-POC for dockernising perl
+Sample Read Me

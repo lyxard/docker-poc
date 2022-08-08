@@ -1,0 +1,26 @@
+td {
+  border: 1px solid #CCC;
+}
+th {
+  border: 1px solid #CCC;
+}
+a {
+  color: #000;
+  text-decoration: none;
+}
+.no_print {
+  display: none;
+}
+.GRID {
+  height: auto !important;
+}
+table.no_border {
+  border: none;
+}
+table.no_border td {
+  border: none;
+}
+input {
+  background: #FFF;
+  border: 1px solid #666;
+}
