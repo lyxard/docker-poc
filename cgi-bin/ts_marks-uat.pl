@@ -8,72 +8,51 @@
 use strict;
 use CGI;
 use CGI::Carp qw(fatalsToBrowser);
-use CGI qw(:standard);
-
-#use CGI::Session::Login;
-#use Unisolve::Config;
+use CGI::Session::Login;
+use Unisolve::Config;
 #
 # External perl files
 #
-#require 'get_acco_ip.pl';
+require 'get_acco_ip.pl';
 require 'connect_db_ts.pl';
 
-#
 # Step 1. Initialize
-
-#body($$);
-#update_marks($);
-#end();
-
-#sub head($$);
-#sub body($$);
-#sub update_marks($);
-#sub end();
+sub head($$);
+sub body($$);
+sub update_marks($);
+sub end();
 
 my $q = new CGI;
-#(my $rev = '$Revision: 1.0 $') =~ s/\$//g;
-#my $session = CGI::Session::Login->new(cgi => $q, url => $ENV{SCRIPT_NAME});
-#exit 0 if (!$session->login());
+(my $rev = '$Revision: 1.0 $') =~ s/\$//g;
+my $session = CGI::Session::Login->new(cgi => $q, url => $ENV{SCRIPT_NAME});
+exit 0 if (!$session->login());
 
 #getting cofig data;
-#my $config_file = "shop_timesheet.conf";
-#my $config = Unisolve::Config->new(
-#           conffile => $config_file,
-# );
-#my $conf_error = $config->check_config(['database', 'db_user', 'db_password']);
+my $config_file = "shop_timesheet.conf";
+my $config = Unisolve::Config->new(
+           conffile => $config_file,
+ );
+my $conf_error = $config->check_config(['database', 'db_user', 'db_password']);
 
 
-#my ($ip, $webpt_ip, $external_webpt_ip) = get_acco_ip();
-#my $revision = "1.0";
+my ($ip, $webpt_ip, $external_webpt_ip) = get_acco_ip();
+my $revision = "1.0";
 
-#my $employee_id;
-#my ($username, $full_name, $department);
+my $employee_id;
+my ($username, $full_name, $department);
 
-# The head we put out in any case
-#head($session, $ip);
 
-my $ip = "localhost:8090";
 my $job = $q->param('job');
-
 
 # Read in text
 $ENV{'REQUEST_METHOD'} =~ tr/a-z/A-Z/;
-
-#print $ENV{'REQUEST_METHOD'};
-
-if ($ENV{'REQUEST_METHOD'} eq "POST") {
-   #print "this is a post!";
-   update_marks($$);
+if ($ENV{'REQUEST_METHOD'} eq "POST"){
+   update_marks($q);
 }
 
 
-
-#if (defined $q->param('dataField')) {
-#  update_marks($q);
-#}
-
-
-head($$);
+# The head we put out in any case
+head($session, $ip);
 body($ip, $job);
 end();
 exit 0;
@@ -81,35 +60,12 @@ exit 0;
 #-------------------------------------------------------------
 # Subroutines
 
+sub head($$) {
+    my ($session, $ip) = @_;
+    ($username, $employee_id, $full_name, $department) = $session->get_username();
 
-#-------------------------------------------------------------
-
-#sub head(){
-#    print "Content-type: text/html\n\n";
-#    print "<html>\n<body>";
-#    print "<div style=\"width: 100%;color: red; font-size: 40px; font-weight: bold; text-align: left;\">";
-#    print "Perl Script Test Page";
-#    print "</div>\n</body>\n<h/html>";#
-#
-#    print "<strong>Step 1</strong>";
-#}
-
-
-#head();
-#body();
-#end();
-
-
-sub head($$){
-
-my ($session, $ip) = @_;
-#my $ip = "localhost:8090";
-#my $job = "A2342343";
-my $revision = "22333";
-my $employee_id = "234234234";
-
+    print $session->header();
 print<<"EOT";
-Content-type: text/html\n\n
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html
 PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -117,27 +73,27 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <title>Marks</title>
-
 </head>
+
 <SCRIPT LANGUAGE="JavaScript">
 var changeMade = 0;
 var notSaved = 0;
 
 function loaded(){
     if(navigator.appName != "Netscape")
-	alert("The Marks page requires Mozilla to function properly.\\n "+
-		"Please re-open the Marks page with Mozilla.");
+        alert("The Marks page requires Mozilla to function properly.\\n "+
+                "Please re-open the Marks page with Mozilla.");
 
     if(noRecords){
-	newRecord();
+        newRecord();
     }
     else
     {
-	var tempBody = document.getElementById('dataTable');
-	var lastLine = tempBody.childNodes.length;
+        var tempBody = document.getElementById('dataTable');
+        var lastLine = tempBody.childNodes.length;
 
-	selectRecord(lastRecord());
-	enableButtons();
+        selectRecord(lastRecord());
+        enableButtons();
     }
     document.main.code.focus();
 }
@@ -150,6 +106,7 @@ function unload_page() {
 }
 
 </script>
+
 <!--<script type="text/javascript" src="/javascript/grid_timesheet.js"></script>
 -->
 
@@ -159,16 +116,16 @@ body
    background-color: #FFF;
 }
 div
-{  
+{
    border: none;
    background-color: #dddddd;
-   width: 556px;  
+   width: 556px;
 }
 .GRID
 {
    overflow: auto;
    height: 194px;
-   width:  554px;  
+   width:  554px;
 }
 table
 {
@@ -178,9 +135,9 @@ tr
 {
    BACKGROUND-COLOR: #FFF;
 }
-
 .hdtxt{
     display: none;
+    vislble: false;
 }
 
 </style>
@@ -188,37 +145,13 @@ EOT
 }
 
 sub body($$){
+    my ($ip, $job) = @_;
 
-my ($ip, $job) = @_;
-
-my $database = "SacMsShop"; 
-my $user = "root";
-my $password = "samplepassword";
-my $host = "127.0.0.1";
-
-#acco_database = acco
-#ptdw_database = ptdw
-#service_database = service
-#pt_server =pt2016
-#submitted_table = SacSMShop_timesheet_submitted
-#host = ts-mysql-uat.accoes.com 
-#email = payroll@accoes.com
-
-#my ($dbh, $error) = connect_db_ts($database, $user, $password,$host);
-#    die $error if ($error);
-
-
-
-
-#my ($dbh, $error) = connect_db_ts($config->{database}, $config->{username}, $config->{password}, $config->{host});
-#    die $error if ($error);
-
-#my $ip = "localhost:8090";
-#my $job = "A2342343";
-my $revision = "22333";
-my $employee_id = "234234234";
+    my ($dbh, $error) = connect_db_ts($config->{database}, $config->{username}, $config->{password}, $config->{host});
+    die $error if ($error);
 
 print<<"EOT";
+
 <body onload = "loaded();" onunload="unload_page()";>
 <script language="Javascript">
 var headerData = new Array("No.","Code","Description");
@@ -226,15 +159,12 @@ var headerDataLen = new Array("45px","80px","399px");
 var cellAlign = new Array("center","center","center");
 var tData = "";
 var fileData = "";
-
-tData += "1~TAFLAT200~ACCO CheckIn~11~";
-tData += "2~11W-13~MAJ~12~";
-tData += "3~11W-1311~MAJ11~13~";
-tData += "4~11W-13222~MAJ22~14~";
-tData += "5~TAFLAT2003~MAJ3~15~";
 EOT
 
+get_ts_marks($dbh, $job);
+
 print<<"EOT";
+
 var tableData = "";
 var fileTableData = "";
 var noRecords = false;
@@ -292,18 +222,23 @@ function createHeader(header){
         cell.style.backgroundColor = tableHeadColor;
         //cell.style.fontWeight = "bold";
         cell.appendChild(document.createTextNode(header[i]));
-       row.appendChild(cell);
+        row.appendChild(cell);
     }
 
     cell = document.createElement("TD");
-    cell.setAttribute("width","14px");
-    cell.style.backgroundColor = tableHeadColor;
+    cell.setAttribute("width","5px");
+    cell.setAttribute("align","center");
+    cell.setAttribute("id","rowData");
+    cell.style.backgroundColor = tableDataColor;
+    cell.appendChild(document.createTextNode("RowId"));
+    cell.className = "hdtxt";
 
     row.appendChild(cell);
     tablebody.appendChild(row);
     table.appendChild(tablebody);
     document.getElementsByTagName("div").item(0).appendChild(table);
 }
+
 function buildbody(appendToId, data, header){
     table = document.createElement("TABLE");
 
@@ -320,7 +255,6 @@ function buildbody(appendToId, data, header){
             cell.setAttribute("align",cellAlign[j]);
             cell.setAttribute("id","rowData");
             cell.style.backgroundColor = tableDataColor;
-
             if(j == 0){
                 cell.appendChild(document.createTextNode(tablebody.childNodes.length+1));
                 i++;
@@ -332,7 +266,7 @@ function buildbody(appendToId, data, header){
         }
 
         cell = document.createElement("TD");
-        cell.setAttribute("width","14px");
+        cell.setAttribute("width","5px");
         cell.setAttribute("align","center");
         cell.setAttribute("id","rowData");
         cell.style.backgroundColor = tableDataColor;
@@ -356,22 +290,24 @@ function buttonDown(e) {
     if(! e_id)
         return true;
     if(e_id == "")
-	return true;
+        return true;
 
     // Record selected
     if(e_id == "rowData"){
-	selectRecord(e.target.parentNode.firstChild.firstChild.nodeValue);
+        selectRecord(e.target.parentNode.firstChild.firstChild.nodeValue);
     }
     if(e_id == "saveRec"){
-	saveRecord();
+        saveRecord();
     }
     if(e_id == "addRec"){
         newRecord();
     }
     if(e_id == "delRec")
         delRecord();
-		
-	eturn true;
+    if(e_id == "canRec")
+        cancelRecord();
+
+    return true;
 }
 function selectRecord(row){
     var scrollAmt = 0;
@@ -409,26 +345,19 @@ function selectRecord(row){
     document.main.actiontype.value = "upd";
 
 }
+
 function disableButtons(){
     document.main.delRec.disabled = true;
-   // document.main.delAllRec.disabled = true;
-
+    document.main.canRec.disabled = false;
 }
+
 function enableButtons(){
     document.main.delRec.disabled = false;
-    //document.main.delAllRec.disabled = false;
+    document.main.canRec.disabled = true;
 }
-function disableButtons(){
-    document.main.delRec.disabled = true;
-   // document.main.delAllRec.disabled = true;
 
-}
-function enableButtons(){
-    document.main.delRec.disabled = false;
-    //document.main.delAllRec.disabled = false;
-}
+
 function delRecord(){
-   /// notSaved = 1;
     document.main.actiontype.value = "del";
     document.main.submit();
 }
@@ -441,7 +370,7 @@ function lastRecord(){
     return 0;
 }
 function addRecord(){
- document.main.submit();
+  document.main.submit();
 }
 
 function removeQuotes(value){
@@ -456,41 +385,36 @@ function newRecord(){
         if(lastRow != "")
             tablebody.childNodes[lastRow-1].childNodes[i].style.backgroundColor = tableDataColor;
     }
-
     disableButtons();
-
-    if(noRecords){
-        document.main.No.value=1;
-    }
-    else{
-        document.main.No.value = lastRecord()+1;
-    }
 
     document.main.code.value = "";
     document.main.description.value = "";
-    document.main.code.focus();
+    //document.main.code.focus();
     document.main.actiontype.value = "add";
-    document.main.job_phase.value = '$job';
+    document.main.job.value = '$job';
     document.main.Id.value = '0';
 }
 
 function saveRecord(){
-    //updateMade();
-    notSaved = 0;
-
-    document.main.submit();
+  document.main.submit();
 }
+
+function cancelRecord(){
+  selectRecord(lastRecord());
+  enableButtons();
+}
+
 
 function back_to_menu() {
   document.location = "/cgi-bin/marks_maintenance.pl";
 }
 function logOut()
 {
-   // var exp = new Date();
-   // exp.setTime (exp.getTime() - 1);
-   // var cval = GetCookie ('CGISESSID');
-   // document.cookie ='CGISESSID' + "=" + cval + "; expires=" + exp.toGMTString();
-  //# document.location= "https://$ip/cgi-bin/marks_maintenance.pl";
+    var exp = new Date();
+    exp.setTime (exp.getTime() - 1);
+    var cval = GetCookie ('CGISESSID');
+    document.cookie ='CGISESSID' + "=" + cval + "; expires=" + exp.toGMTString();
+    document.location= "http://$ip/cgi-bin/marks_maintenance.pl";
 }
 function display(ImageName, filename)
 {
@@ -499,46 +423,44 @@ function display(ImageName, filename)
 </script>
 <form name="info">
     <table width="640px">
-	<tr>
-	    <td >
-		<a href="/" ><img height=50 src="images/accoLogoClr.gif" border=0></img></a>
-	    </td>
-	    <td >
-		<center><font size=5><b>Marks</b></font></center>
-	    </td>
-	    <td align="right">
-	        <input type="button" id="backToMenu" value="Back" onClick="back_to_menu()" />
-		<input type=button id="logOutButton" value="Log Out" onFocus="document.main.No.focus();" onClick="logOut();" ></input><br>
-		<!-- <IMG NAME="status_image" src="/images/acc_grid_green.jpg"></IMG> -->
-	    </td>
-	</tr>
-	<tr>
-	    <td colspan=6>
-		<br>
-	    </td>
-	</tr>
-	<tr>
-	    <td>
-		Job:&nbsp;
-		<b>$job</b>
-	    </td>
-	    <td>
-	    </td>
-	    <td>
-	    </td>
-	</tr>
+        <tr>
+          <td>
+              <a href="http://$ip/" >
+                <img height="50" src="https://$ip/images/insideaccoImages/accoLogoClr.gif" border="0"></img>
+              </a>
+          </td>
+          <td>
+              <center><font size="5"><b>Marks</b></font></center>
+          </td>
+          <td align="right">
+             <input type="button" id="backToMenu" value="Back" onClick="back_to_menu()" />
+             <input type="button" id="logOutButton" value="Log Out" onFocus="document.main.No.focus();" onClick="logOut();"/><br>
+          </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+              <br>
+            </td>
+        </tr>
+        <tr>
+           <td>
+              Job:&nbsp;<b>$job</b>
+           </td>
+          <td>
+          </td>
+        </tr>
     </table>
 </form>
-    <div bgcolor=white>
-	<script language = "Javascript">
-	    createHeader(headerData);
-	</script>
-    </div>
+ <div bgcolor=white>
+ <script language = "Javascript">
+    createHeader(headerData);
+ </script>
+  </div>
     <script language="Javascript">
-	    document.write("<div class='GRID' id=divList bgcolor=white>");
+            document.write("<div class='GRID' id=divList bgcolor=white>");
     </script>
     <script language = "Javascript">
-	buildbody("", tableData, headerData);
+        buildbody("", tableData, headerData);
     </script>
     </div>
 <br>
@@ -547,14 +469,10 @@ function display(ImageName, filename)
 <table>
   <tr>
     <td>
-	Line #
+        Line #
     </td>
     <td>
         <input type="text" size="10" id="No" name="No" onblur='validateLine();'> </input>
-    </td>
-    <td>
-    </td>
-    <td>
     </td>
   </tr>
   <tr>
@@ -564,51 +482,30 @@ function display(ImageName, filename)
     <td>
         <input type="text" size="10" id="code" name="code"  maxlength="10"></input>
     </td>
-    <td>
-    </td>
-    <td>
-    </td>
   </tr>
   <tr>
     <td>
         Description
     </td>
-    <td colspan=3>
+    <td>
         <input type="text" id="description" name="description" size="60"></input>
     </td>
-  </tr>
+ </tr>
  <tr>
-  <td colspan=3>
+  <td>
      <input type="hidden" id="Id" name="Id"></input>
-     <input type="hidden" id="actiontype" name="actiontype"></input>
-      <input type="hidden" id="job" name="job" value="$job"></input>
- </td>
-<td>
-        <input type="text" size="10" id="No" name="No" onblur='validateLine();'> </input>
-    </td>
-  </tr>
- <tr>
-  <td colspan=3>
-     <input type="hidden" id="Id" name="Id"></input>
-     <input type="hidden" id="actiontype" name="actiontype"></input>
-     <input type="hidden" id="job" name="job" value="$job"></input>
- </td>
+     <input type="hidden" id="actiontype" name="actiontype" />
+     <input type="hidden" id="job" name="job" value="$job" />
+     <input type="button" id="addRec" value="Add" onFocus="document.main.No.focus();" />
+  </td>
+   <td>
+     <input type="button" id="canRec" value="Cancel" OnClick="cancelRecord()" disabled />
+     <input type="button" id="delRec" value="Delete" onFocus="document.main.No.focus();" disabled />
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     <font size="2">Marks ver. # $revision</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     <input type="button" id="saveRec" value="Save Data"  onFocus="document.main.No.focus();"></input>
+  </td>
 </tr>
-  <tr>
-    <td>
-        <input type="button" id="addRec" value="Add" onFocus="document.main.No.focus();"></input>
-    </td>
-    <td>
-        <input type="button" id="delRec" value="Delete" onFocus="document.main.No.focus();"></input>
-    </td>
-    <td>
-        <font size="2">Marks ver. # $revision</font>
-        <!-- <input type=button id="delAllRec" value="Delete All" onFocus="document.main.No.focus();" disabled></input> -->
-    </td>
-    <td>
-        <input type="button" id="saveRec" value="Save Data"  onFocus="document.main.No.focus();" disabled></input>
-    </td>
-  </tr>
 </table>
 EOT
 
@@ -618,8 +515,7 @@ print <<"EOT";
 <input type="hidden" name="textemplid" value="$employee_id">
 </form>
 EOT
-  #$dbh->disconnect();
-
+  $dbh->disconnect();
 }
 
 sub end(){
@@ -654,16 +550,13 @@ print << "EOT";
             return true;
         }
     }
+
+    //document.main.No.onkeypress=block_plus_and_minus_line;
     function block_plus_and_minus_line(e)
     {
         var keyChar = String.fromCharCode(e.which);
         var currNo = document.main.No.value;
-/*        if(notValidated || document.main.code.value != ""){
-            if(!validate_row()){
-                return false;
-            }
-        }
-*/        if( keyChar != '0' && keyChar != '1' && keyChar != '2' && keyChar != '3' &&
+        if( keyChar != '0' && keyChar != '1' && keyChar != '2' && keyChar != '3' &&
                 keyChar != '4' && keyChar != '5' && keyChar != '6' &&
                 keyChar != '7' && keyChar != '8' && keyChar != '9' &&
                 keyChar != '+' && keyChar != '=' && keyChar != '-' &&
@@ -700,6 +593,7 @@ print << "EOT";
             return true;
         }
     }
+
     function change_line(oldLine, lines)
     {
         var tempBody = document.getElementById("dataTable");
@@ -735,14 +629,7 @@ print << "EOT";
 
     function validateLine(){
         var currNo = document.main.No.value;
-/*        if(notValidated || document.main.hours.value!=0 ||
-                 document.main.jobNumber.value!="" || document.main.activity.value!="" ||
-                 document.main.memo.value != ""){
-            if(!validate_row()){
-                return false;
-            }
-        }
-*/        if(isNaN(currNo)){
+        if(isNaN(currNo)){
             alert("The Line number must be a number.");
             if(currRow ==0)
                 document.main.No.value = currRow+1;
@@ -779,19 +666,19 @@ print << "EOT";
 </script>
 </HTML>
 EOT
-
 }
 
 sub get_ts_marks($$) {
   my ($dbh, $job) = @_;
+
   my $sth = $dbh->prepare("
     SELECT line, code, description, Id
       FROM marks
-     WHERE job_phase = $job
+     WHERE job_phase = ?
   ORDER BY line
   ");
 
-  $sth->execute();
+  $sth->execute("$job");
   my %marks;
   while (my $res = $sth->fetchrow_hashref) {
     print <<"EOT";
@@ -801,13 +688,8 @@ EOT
 }
 
 sub update_marks($) {
-#print "update marks";
-
-    my ($q) = @_;
-    my $cgi = new CGI;
-    #my $job = $q->param('job');
-    #my $code = $q->param('code');
-    #my $desc = param('description');
+  my ($q) = @_;
+  my $cgi = new CGI;
 
   my $job = $q->param('job');
   my $No = $q->param('No');
@@ -819,15 +701,13 @@ sub update_marks($) {
   my ($dbh, $error) = connect_db_ts($config->{database}, $config->{username}, $config->{password}, $config->{host});
     die $error if ($error);
 
- # $dbh->do('Delete From Marks Where ID = 3984');
-
  my $sth = $dbh->prepare('Call update_Marks(?,?,?,?,?,?)');
  $sth->execute($action, $Id, $No, $job,$code, $desc);
 
  $dbh->disconnect();
 
   print $cgi->redirect(
-        -uri => "https://$ip$ENV{SCRIPT_NAME}?job=$job",
+         -uri => "https://$ip$ENV{SCRIPT_NAME}?job=$job",
         -status => 303
   );
 
